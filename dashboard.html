@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit Digit Pro</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app-content">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="user-info">
+                <h1>Profit Digit Pro</h1>
+                <p>Welcome,<br>trader1@deriv.com</p>
+            </div>
+            <button class="btn-signout" id="logout-btn">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+            </button>
+        </header>
+
+        <!-- Controls -->
+        <div class="control-row">
+            <button class="btn-control btn-start" id="start-btn">
+                <i class="fa-solid fa-play"></i> Start Analysis
+            </button>
+            <button class="btn-control btn-stop" id="stop-btn">
+                <i class="fa-regular fa-square"></i> Stop Analysis
+            </button>
+        </div>
+
+        <!-- Configuration Card -->
+        <section class="card">
+            <h2><i class="fa-solid fa-bolt"></i> Configuration</h2>
+
+            <div class="form-group">
+                <label>Volatility Index</label>
+                <select id="asset-select" class="custom-select">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Strategy</label>
+                <select id="strategy-select" class="custom-select">
+                    <option value="even_odd">Even/Odd</option>
+                    <option value="matches_differs">Matches/Differs</option>
+                    <option value="over_under">Over/Under</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Connection Status</label>
+                <div class="connection-status">
+                    <span class="status-dot disconnected" id="connection-dot"></span>
+                    <span id="connection-text">Disconnected</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Current Data - Live Feed</label>
+                <div class="live-data-box">
+                    <div id="feed-status-text" class="status-text">Connecting...</div>
+                    <div class="digit-display">Digit: <span id="last-digit-display">--</span></div>
+                    <div class="digit-display" style="font-size: 0.75rem; margin-top:5px;">
+                        <span id="feed-subtext">Connecting...</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="predict-btn" class="btn-predict">
+                <i class="fa-solid fa-brain"></i> Predict
+            </button>
+        </section>
+
+        <!-- Prediction Result Card -->
+        <section class="card" id="prediction-card" style="display: none;">
+            <h2><i class="fa-solid fa-bullseye"></i> Prediction Result</h2>
+
+            <div class="prediction-main">
+                <div class="p-strategy">Strategy <br> <span id="p-strategy-val">Even/Odd</span></div>
+                <div class="p-result">
+                    <span class="p-label">Prediction</span>
+                    <span class="p-value" id="p-value">--</span>
+                </div>
+            </div>
+
+            <div class="confidence-section">
+                <div class="c-header">
+                    <span>Confidence</span>
+                    <span id="c-percent">0.0%</span>
+                </div>
+                <div class="c-bar-bg">
+                    <div class="c-bar-fill" id="c-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="analysis-box">
+                <div class="a-icon"><i class="fa-solid fa-bolt"></i></div>
+                <div class="a-text" id="ai-analysis-text">
+                    Waiting for analysis...
+                </div>
+            </div>
+        </section>
+
+        <!-- Digit Frequency Card -->
+        <section class="card">
+            <h2><i class="fa-solid fa-chart-simple"></i> Digit Frequency Analysis</h2>
+            <div class="digit-grid" id="digit-grid">
+                <!-- JS Generated 0-9 cards -->
+            </div>
+        </section>
+
+        <!-- Chart Card -->
+        <section class="card chart-card">
+            <div class="chart-header-row">
+                <h2><i class="fa-solid fa-chart-line"></i> Deriv Live Chart - <span id="chart-asset-name">Vol 10
+                        (1s)</span></h2>
+                <div class="chart-meta">
+                    <div>
+                        <span class="meta-label">Last Update:</span>
+                        <span class="meta-val" id="chart-time">--:--:--</span>
+                    </div>
+                    <div>
+                        <span class="meta-label">Price:</span>
+                        <span class="meta-val" id="chart-price">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="connection-status" style="display:none;"></div> <!-- Hiding old status -->
+
+            <div class="chart-container-mobile">
+                <div class="live-badge">Live Feed</div>
+                <canvas id="tickChart"></canvas>
+            </div>
+
+            <div class="chart-stats-row">
+                <div class="chart-stat">
+                    <span class="label">HIGH</span>
+                    <span class="value high" id="stat-high">--</span>
+                </div>
+                <div class="chart-stat">
+                    <span class="label">LOW</span>
+                    <span class="value low" id="stat-low">--</span>
+                </div>
+                <div class="chart-stat">
+                    <span class="label">CURRENT</span>
+                    <span class="value" id="stat-current">--</span>
+                </div>
+                <div class="chart-stat">
+                    <span class="label">TREND</span>
+                    <span class="value trend" id="stat-trend">--</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Statistics -->
+        <section class="card">
+            <h2><i class="fa-solid fa-chart-pie"></i> Analysis Statistics</h2>
+            <div class="analysis-stats-row">
+                <div class="a-stat">
+                    <h4>Total Digits</h4>
+                    <p id="total-digits-count">0</p>
+                </div>
+                <div class="a-stat">
+                    <h4>Analysis Duration</h4>
+                    <p id="analysis-duration">Stopped</p>
+                </div>
+                <div class="a-stat">
+                    <h4>Data Points</h4>
+                    <p id="data-points-count">0</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            &copy; 2025 Profit Digit Pro. All rights reserved.
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

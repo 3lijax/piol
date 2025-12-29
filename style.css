@@ -1,0 +1,525 @@
+/* Professional Trading Theme - Mobile First Redesign */
+:root {
+    /* Base Colors - Deep Green/Teal Theme */
+    --bg-dark: #002220;
+    /* Very dark green/slate */
+    --bg-card: #01322f;
+    /* Slightly lighter card bg */
+    --bg-input: #0f403d;
+    /* Input background */
+
+    /* Branding */
+    --primary: #10b981;
+    /* Emerald Green */
+    --primary-hover: #059669;
+    --primary-glow: rgba(16, 185, 129, 0.4);
+
+    --accent-red: #ef4444;
+    /* Stop/Crash */
+    --accent-gold: #f59e0b;
+    /* Attention */
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+
+    /* Effects */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+    --radius: 12px;
+    --font-main: 'Outfit', sans-serif;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    min-height: 100vh;
+}
+
+/* Layout */
+.app-content {
+    max-width: 480px;
+    /* Mobile width constraint */
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Desktop / Full Screen Layout */
+@media (min-width: 900px) {
+    .app-content {
+        max-width: 1400px;
+        /* Wide screen */
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        /* Sidebar controls | Main visuals */
+        grid-template-rows: auto 1fr;
+        align-items: start;
+        gap: 25px;
+    }
+
+    .app-header {
+        grid-column: 1 / -1;
+    }
+
+    /* Wrap controls in a pseudo-column using order or just flex */
+    .control-row {
+        grid-column: 1;
+    }
+
+    /* We need to target specific sections. 
+       Since HTML is flat, we might need a container wrapper or use nth-child logic if structures vary.
+       But simple approach: 
+    */
+
+    /* Sidebar: Controls (2), Config (3) */
+    .control-row {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    /* Config Card */
+    section.card:nth-of-type(1) {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    /* Prediction Result (2) */
+    section.card#prediction-card {
+        grid-column: 1;
+        grid-row: 4;
+    }
+
+    /* Freq (3), Chart (4), Stats (5) -> Main Column */
+    /* Digit Frequency */
+    section.card:nth-of-type(3) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    /* Chart */
+    section.card.chart-card {
+        grid-column: 2;
+        grid-row: 3;
+    }
+
+    /* Analysis Stats */
+    section.card:nth-last-of-type(1) {
+        grid-column: 2;
+        grid-row: 4;
+    }
+
+    .footer {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-card);
+    padding: 15px;
+    border-radius: var(--radius);
+    border: var(--glass-border);
+}
+
+.user-info h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.user-info p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.btn-signout {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-main);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Control Row */
+.control-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn-control {
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    /* Default disabled state if needed */
+}
+
+.btn-start {
+    background: var(--primary);
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.btn-stop {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--accent-red);
+    color: #fca5a5;
+}
+
+/* Configuration Card */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: var(--glass-border);
+}
+
+.card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.custom-select {
+    width: 100%;
+    padding: 14px;
+    background: var(--bg-input);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    appearance: none;
+    /* Remove default arrow */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3cpolyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+}
+
+.connection-status {
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    background: #555;
+}
+
+.status-dot.connected {
+    background: var(--primary);
+}
+
+.status-dot.disconnected {
+    background: var(--accent-red);
+}
+
+/* Live Data Box */
+.live-data-box {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 30px;
+    text-align: center;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-text {
+    font-size: 1.2rem;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.digit-display {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.btn-predict {
+    width: 100%;
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    /* Purple to Pink gradient */
+    border: none;
+    border-radius: var(--radius);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Digit Frequency Analysis */
+.digit-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.digit-card {
+    background: var(--bg-input);
+    border-radius: 8px;
+    padding: 10px 5px;
+    text-align: center;
+    border: 1px solid transparent;
+}
+
+.digit-card .num {
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.digit-card .pct {
+    font-size: 0.75rem;
+    color: var(--primary);
+}
+
+/* Chart Section */
+.chart-container-mobile {
+    height: 300px;
+    width: 100%;
+    position: relative;
+}
+
+.chart-stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-stat {
+    text-align: center;
+}
+
+.chart-stat .label {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.chart-stat .value {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.chart-stat .value.high {
+    color: var(--primary);
+}
+
+.chart-stat .value.low {
+    color: var(--accent-red);
+}
+
+.chart-stat .value.trend {
+    color: var(--accent-gold);
+}
+
+
+/* --- Prediction Result Card Styles --- */
+.prediction-main {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.p-strategy {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.p-result {
+    margin: 10px 0;
+}
+
+.p-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.p-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    display: block;
+    line-height: 1.2;
+}
+
+.p-value.green {
+    color: var(--primary);
+    text-shadow: 0 0 20px var(--primary-glow);
+}
+
+.p-value.red {
+    color: var(--accent-red);
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.confidence-section {
+    margin-bottom: 20px;
+}
+
+.c-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.c-bar-bg {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.c-bar-fill {
+    height: 100%;
+    background: white;
+    /* Will be colored dynamically */
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.analysis-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.a-icon {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-top: 2px;
+}
+
+.a-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #cbd5e1;
+    font-family: monospace;
+    /* Technical look */
+}
+
+/* Chart Enhancements */
+.chart-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.chart-card h2 {
+    margin-bottom: 0;
+}
+
+.chart-meta {
+    text-align: right;
+    font-size: 0.8rem;
+}
+
+.meta-label {
+    color: var(--text-muted);
+    margin-right: 5px;
+}
+
+.meta-val {
+    font-weight: 600;
+    font-family: monospace;
+}
+
+.live-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    pointer-events: none;
+    /* Let clicks pass through */
+}
+
+/* Analysis Stats */
+.analysis-stats-row {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.a-stat h4 {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.a-stat p {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}

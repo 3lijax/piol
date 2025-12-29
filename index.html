@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Profit Digit Pro</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #002220;
+            --bg-card: #01322f;
+            --primary: #10b981;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --font-main: 'Outfit', sans-serif;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+        }
+
+        .login-card {
+            background: rgba(1, 50, 47, 0.6);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #fff, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .license-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-social {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-social:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .footer-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .copyright {
+            margin-top: 40px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <h1 class="logo">Profit Digit Pro</h1>
+        <p class="subtitle">Advanced Trading Analytics</p>
+
+        <div class="license-badge">
+            <i class="fa-solid fa-crown"></i> Lifetime License Active
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label>Email ID</label>
+                <input type="email" class="input-field" placeholder="trader@deriv.com" value="trader1@deriv.com"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="input-field" placeholder="••••••••" value="password123" required>
+            </div>
+
+            <label class="checkbox-group">
+                <input type="checkbox" id="remember-me" checked>
+                Remember me
+            </label>
+
+            <button type="submit" class="btn-login">Sign In</button>
+        </form>
+
+        <div class="social-buttons">
+            <a href="#" class="btn-social">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem; color: #25D366;"></i> WhatsApp
+            </a>
+            <a href="#" class="btn-social">
+                <i class="fa-brands fa-telegram" style="font-size: 1.2rem; color: #2AABEE;"></i> Telegram
+            </a>
+        </div>
+
+        <a href="mailto:support@profitdigitpro.com" class="footer-link">Need Help? Contact Support</a>
+
+        <div class="copyright">
+            &copy; 2026 Profit Digit Pro. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            // Simple mock login
+            const btn = this.querySelector('.btn-login');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+            btn.style.opacity = '0.8';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+    </script>
+</body>
+
+</html>
