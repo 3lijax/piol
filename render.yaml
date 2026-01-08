@@ -1,0 +1,18 @@
+services:
+  # Backend Collector
+  - type: web
+    name: tradingpoolfx-collector
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node collector.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+
+  # Frontend Static Site
+  - type: static
+    name: tradingpoolfx-web
+    env: static
+    buildCommand: npm install
+    staticPublishPath: .

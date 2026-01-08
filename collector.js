@@ -213,3 +213,14 @@ function processTick(symbol, digit, price) {
 // Start
 console.log('Starting Tradingpoolfx Engine...');
 connect();
+
+// Render Web Service Requirement: Must listen on a port
+const http = require('http');
+const port = process.env.PORT || 3000;
+http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('Tradingpoolfx Collector is Running');
+    res.end();
+}).listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
