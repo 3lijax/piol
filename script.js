@@ -273,29 +273,26 @@ function handleNewData(price, digit) {
     DOM.stats.dataPoints.innerText = State.ticks.length;
 
     updateFrequency();
-    updateOverUnderStats(digit); // New Real-time Footer Logic
+    updateOverUnderUI(digit);
 }
 
-function updateOverUnderStats(lastDigit) {
-    const total = State.ticks.length;
-    if (total === 0) return;
+function updateOverUnderUI(currentDigit) {
+    const counts = { over: 0, under: 0 };
 
     // Logic: 0-4 = Under, 5-9 = Over
-    let underCount = 0;
-    let overCount = 0;
-
     State.ticks.forEach(t => {
-        if (t.digit <= 4) underCount++;
-        else overCount++;
+        if (t.digit > 4) counts.over++;
+        else counts.under++;
     });
 
-    const underWinRate = ((underCount / total) * 100).toFixed(1);
-    const overWinRate = ((overCount / total) * 100).toFixed(1);
+    const total = State.ticks.length;
 
-    // Dynamically update the Duration or Data Points area with the win rate
-    const strategy = DOM.select.strategy.value;
-    if (strategy === 'over_under') {
-        DOM.stats.duration.innerHTML = `U: ${underWinRate}% | O: ${overWinRate}%`;
+    // Update Feed Status Text for Real-Time Feedback
+    // Highlight the active side in your configuration box
+    const statusText = document.getElementById('feed-status-text');
+    if (statusText) {
+        statusText.innerText = `Analyzing: ${currentDigit > 4 ? 'OVER' : 'UNDER'}`;
+        statusText.style.color = currentDigit > 4 ? '#64ffda' : '#ef4444';
     }
 }
 
