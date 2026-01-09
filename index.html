@@ -378,92 +378,196 @@
 
                 <h3>1. Acceptance of Terms</h3>
                 <p>By accessing or using Tradingpoolfx-pro, you agree to be bound by these Terms and Conditions. If you
-                    do not agree, please do
+                    do not agree, please do not use the tool.</p>
+
+                <h3>2. No Financial Advice</h3>
+                <ul>
+                    <li><strong>For Information Only:</strong> This tool provides data analysis and visualization for
+                        informational purposes only.</li>
+                    <li><strong>Not a Broker:</strong> We are not a financial advisor, investment solicitor, or
+                        broker-dealer.</li>
+                    <li><strong>User Responsibility:</strong> Any trades placed based on the analysis provided by this
+                        tool are taken at your own risk. We recommend consulting with a certified financial professional
+                        before making any investment decisions.</li>
+                </ul>
+
+                <h3>3. High-Risk Investment Warning</h3>
+                <p>Trading in financial markets (including but not limited to Forex, Stocks, and Crypto) carries a high
+                    level of risk and may not be suitable for all investors. The possibility exists that you could
+                    sustain a loss of some or all of your initial investment.</p>
+
+                <h3>4. Intellectual Property</h3>
+                <p>All content, features, and functionality (including but not limited to the "Pro-X" branding,
+                    algorithms, code, and UI design) are the exclusive property of Tradingpoolfx and are protected by
+                    international copyright and trademark laws.</p>
+
+                <h3>5. Limitation of Liability</h3>
+                <p>To the maximum extent permitted by law, Tradingpoolfx shall not be liable for any:</p>
+                <ul>
+                    <li>Financial losses or lost profits.</li>
+                    <li>Data inaccuracies or "lag" in market feeds.</li>
+                    <li>Technical failures or downtime of the tool.</li>
+                </ul>
+
+                <h3>6. User Accounts</h3>
+                <p>If the tool requires an account:</p>
+                <ul>
+                    <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+                    <li>You must notify us immediately of any unauthorized use of your account.</li>
+                </ul>
+
+                <h3>7. Termination</h3>
+                <p>We reserve the right to terminate or suspend your access to the tool immediately, without prior
+                    notice, for any reason, including breach of these Terms.</p>
+
+                <h3>8. Governing Law</h3>
+                <p>These Terms shall be governed and construed in accordance with the laws of UK, without regard to its
+                    conflict of law provisions.</p>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="closeModal('termsModal')" class="btn-login"
+                        style="width: auto; padding: 12px 30px;">I Understand and Agree</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal Markup -->
+    <div id="privacyModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Privacy Policy</div>
+                <button class="modal-close" onclick="closeModal('privacyModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Effective Date: 3rd, January, 2026</h3>
+
+                <h3>1. Zero Data Collection Policy</h3>
+                <p>We believe in total privacy for traders. Tradingpoolfx-pro does not collect, store, or track any
+                    personal data, browsing history, or trading activity.</p>
+                <ul>
+                    <li>We do not use tracking cookies.</li>
+                    <li>We do not store your IP address.</li>
+                    <li>We do not have a database of your trading analysis.</li>
+                </ul>
+
+                <h3>2. Authentication & Access</h3>
+                <p>Access to this tool is managed manually to ensure security:</p>
+                <ul>
+                    <li><strong>Login Requests:</strong> Logins are requested and issued via our official WhatsApp link.
+                    </li>
+                    <li><strong>Authentication Only:</strong> We only use the credentials provided to you to grant
+                        access to the tool. This information is used strictly for authentication and is not linked to
+                        any personal identity or external profiles.</li>
+                </ul>
+
+                <h3>3. WhatsApp Communication</h3>
+                <p>When you contact us via WhatsApp to request access, your phone number and chat history are governed
+                    by WhatsApp’s own Privacy Policy. We only use this connection to provide you with your login
+                    credentials and technical support.</p>
+
+                <h3>4. Third-Party Links</h3>
+                <p>Our site may contain links to external market data providers. We are not responsible for the privacy
+                    practices of these external sites.</p>
+
+                <h3>5. Data Security</h3>
+                <p>Even though we do not collect data, we use industry-standard encryption to ensure that your session
+                    while using the trading tool remains secure and private.</p>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="closeModal('privacyModal')" class="btn-login"
+                        style="width: auto; padding: 12px 30px;">I Understand and Agree</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
-                    <script type="module">
-                        import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+    <script type="module">
+        import { auth, signInWithEmailAndPassword } from './firebase-config.js';
 
-                        // Modal Functionality
-                        window.openModal = function (modalId) {
-                            const modal = document.getElementById(modalId);
-                            modal.style.display = 'flex';
-                            // Force reflow for transition
-                            setTimeout(() => {
-                                modal.classList.add('show');
-                            }, 10);
-                        }
+        // Modal Functionality
+        window.openModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+            // Force reflow for transition
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
 
-                        window.closeModal = function (modalId) {
-                            const modal = document.getElementById(modalId);
-                            modal.classList.remove('show');
-                            setTimeout(() => {
-                                modal.style.display = 'none';
-                            }, 300); // Match transition duration
-                        }
+        window.closeModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300); // Match transition duration
+        }
 
-                        document.getElementById('login-form').addEventListener('submit', async function (e) {
-                            e.preventDefault();
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-                            const email = this.querySelector('input[type="email"]').value;
-                            const password = this.querySelector('input[type="password"]').value;
-                            const btn = this.querySelector('.btn-login');
-                            const originalBtnContent = btn.innerHTML;
+            const email = this.querySelector('input[type="email"]').value;
+            const password = this.querySelector('input[type="password"]').value;
+            const btn = this.querySelector('.btn-login');
+            const originalBtnContent = btn.innerHTML;
 
-                            // Loading state
-                            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
-                            btn.style.opacity = '0.8';
-                            btn.disabled = true;
+            // Loading state
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+            btn.style.opacity = '0.8';
+            btn.disabled = true;
 
-                            try {
-                                // Strict Firebase Authentication
-                                await signInWithEmailAndPassword(auth, email, password);
+            try {
+                // Strict Firebase Authentication
+                await signInWithEmailAndPassword(auth, email, password);
 
-                                // Login successful
-                                sessionStorage.setItem('authenticated', 'true');
+                // Login successful
+                sessionStorage.setItem('authenticated', 'true');
 
-                                // Remove potential conflict
-                                localStorage.removeItem('user');
+                // Remove potential conflict
+                localStorage.removeItem('user');
 
-                                window.location.replace('dashboard.html');
-                            } catch (error) {
-                                console.error("Login error:", error);
+                window.location.replace('dashboard.html');
+            } catch (error) {
+                console.error("Login error:", error);
 
-                                // Clear session on error to be safe
-                                sessionStorage.removeItem('authenticated');
+                // Clear session on error to be safe
+                sessionStorage.removeItem('authenticated');
 
-                                // Display user-friendly error
-                                alert("Login failed: " + error.message);
+                // Display user-friendly error
+                alert("Login failed: " + error.message);
 
-                                // Reset button
-                                btn.innerHTML = originalBtnContent;
-                                btn.style.opacity = '1';
-                                btn.disabled = false;
-                            }
-                        });
+                // Reset button
+                btn.innerHTML = originalBtnContent;
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            }
+        });
 
-                        // Event Listeners
-                        document.getElementById('termsTrigger').addEventListener('click', (e) => {
-                            e.preventDefault();
-                            openModal('termsModal');
-                        });
+        // Event Listeners
+        document.getElementById('termsTrigger').addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('termsModal');
+        });
 
-                        document.getElementById('privacyTrigger').addEventListener('click', (e) => {
-                            e.preventDefault();
-                            openModal('privacyModal');
-                        });
+        document.getElementById('privacyTrigger').addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('privacyModal');
+        });
 
-                        // Click outside to close
-                        window.addEventListener('click', (e) => {
-                            if (e.target.classList.contains('modal-backdrop')) {
-                                closeModal(e.target.id);
-                            }
-                        });
+        // Click outside to close
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-backdrop')) {
+                closeModal(e.target.id);
+            }
+        });
 
-                        // Mobile Modal Fix
-                        const style = document.createElement('style');
-                        style.textContent = `
+        // Mobile Modal Fix
+        const style = document.createElement('style');
+        style.textContent = `
             @media (max-width: 768px) {
                 .modal {
                     max-height: 90vh; /* More height on mobile */
@@ -475,8 +579,8 @@
                 }
             }
         `;
-                        document.head.appendChild(style);
-                    </script>
+        document.head.appendChild(style);
+    </script>
 </body>
 
 </html>
