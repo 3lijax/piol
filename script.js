@@ -147,7 +147,8 @@ function detectType(symbol) {
     return 'volatility'; // fallback
 }
 
-const extractDigit = (price) => Number(price.toString().slice(-1));
+// Robust Digit Extraction (Works for all pip sizes/decimal points)
+const extractDigit = (price) => parseInt(price.toFixed(2).slice(-1));
 
 function statsFromArray(arr) {
     if (!arr.length) return { mean: 0, std: 0 };
@@ -241,6 +242,7 @@ class WSClient {
     }
 
     subscribe() {
+        // Force ALL symbols to use tick-based data for zero-buffer loading
         this.ws.send(JSON.stringify({
             ticks: State.currentSymbol,
             subscribe: 1
@@ -271,13 +273,30 @@ function handleNewData(price, digit) {
     DOM.stats.dataPoints.innerText = State.ticks.length;
 
     updateFrequency();
-    updateOverUnder(digit); // New Function
+    updateOverUnderStats(digit); // New Real-time Footer Logic
 }
 
-function updateOverUnder(digit) {
-    // Logic: 0-4 Under, 5-9 Over
-    // We can add a simple visual if needed, for now we ensure logic runs
-    // Could update a specific UI element if requested
+function updateOverUnderStats(lastDigit) {
+    const total = State.ticks.length;
+    if (total === 0) return;
+
+    // Logic: 0-4 = Under, 5-9 = Over
+    let underCount = 0;
+    let overCount = 0;
+
+    State.ticks.forEach(t => {
+        if (t.digit <= 4) underCount++;
+        else overCount++;
+    });
+
+    const underWinRate = ((underCount / total) * 100).toFixed(1);
+    const overWinRate = ((overCount / total) * 100).toFixed(1);
+
+    // Dynamically update the Duration or Data Points area with the win rate
+    const strategy = DOM.select.strategy.value;
+    if (strategy === 'over_under') {
+        DOM.stats.duration.innerHTML = `U: ${underWinRate}% | O: ${overWinRate}%`;
+    }
 }
 
 function resetStats() {
@@ -330,24 +349,8 @@ function updateChart(price) {
     DOM.display.chartPrice.innerText = price.toFixed(4);
 
     const data = State.chart.data.datasets[0].data;
-    const bgColors = State.chart.data.datasets[0].pointBackgroundColor;
-    const borderColors = State.chart.data.datasets[0].pointBorderColor;
-
     data.push(price);
-
-    // Dynamic Matches Visualization
-    // Even = Royal Blue (#3b82f6), Odd = Lighter Blue (#60a5fa)
-    const isEven = digit % 2 === 0;
-    const color = isEven ? '#3b82f6' : '#60a5fa';
-
-    bgColors.push('#0b1120'); // Keep background dark navy
-    borderColors.push(color);
-
-    if (data.length > CONFIG.maxTicks) {
-        data.shift();
-        bgColors.shift();
-        borderColors.shift();
-    }
+    if (data.length > CONFIG.maxTicks) data.shift();
 
     State.chart.update('none');
 
@@ -502,8 +505,6 @@ function setSymbol(symbol) {
     // Reset Chart Data
     if (State.chart) {
         State.chart.data.datasets[0].data = Array(CONFIG.maxTicks).fill(null);
-        State.chart.data.datasets[0].pointBackgroundColor = [];
-        State.chart.data.datasets[0].pointBorderColor = [];
         State.chart.update();
     }
 }
@@ -546,9 +547,26 @@ function initChart() {
                 borderColor: '#3b82f6',
                 backgroundColor: gradient,
                 borderWidth: 2,
-                pointRadius: 4,
-                pointBackgroundColor: [], // Dynamic Array
-                pointBorderColor: [],     // Dynamic Array
+                pointRadius: 5, // Better visibility
+                // Conditional Point Coloring
+                pointBackgroundColor: (context) => {
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (!value) return '#3b82f6'; // Default Royal Blue
+
+                    const digit = extractDigit(value);
+                    const strategy = DOM.select.strategy.value;
+
+                    // Highlight 'Over' (5-9) in Cyan and 'Under' (0-4) in Red
+                    if (strategy === 'over_under') {
+                        return digit > 4 ? '#64ffda' : '#ef4444';
+                    }
+                    // Highlight Digit 7 for Matches strategy in Green
+                    if (strategy === 'matches_differs' && digit === 7) return '#10b981';
+
+                    return '#3b82f6';
+                },
+                pointBorderColor: '#3b82f6',
                 pointBorderWidth: 2,
                 fill: true,
                 tension: 0.4
