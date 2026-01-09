@@ -548,8 +548,8 @@ function initMarketSelectors() {
 function initChart() {
     const ctx = document.getElementById('tickChart').getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
     State.chart = new Chart(ctx, {
         type: 'line',
@@ -557,12 +557,12 @@ function initChart() {
             labels: Array(CONFIG.maxTicks).fill(''),
             datasets: [{
                 data: Array(CONFIG.maxTicks).fill(null),
-                borderColor: '#10b981',
+                borderColor: '#3b82f6',
                 backgroundColor: gradient,
                 borderWidth: 2,
                 pointRadius: 4,
-                pointBackgroundColor: '#002220',
-                pointBorderColor: '#10b981',
+                pointBackgroundColor: '#0b1120',
+                pointBorderColor: '#3b82f6',
                 pointBorderWidth: 2,
                 fill: true,
                 tension: 0.4

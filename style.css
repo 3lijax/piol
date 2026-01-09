@@ -1,28 +1,30 @@
 /* Professional Trading Theme - Mobile First Redesign */
 :root {
-    /* Base Colors - Deep Green/Teal Theme */
-    --bg-dark: #002220;
-    /* Very dark green/slate */
-    --bg-card: #01322f;
-    /* Slightly lighter card bg */
-    --bg-input: #0f403d;
-    /* Input background */
+    /* Base Colors - Deep Navy Professional Theme */
+    --bg-dark: #0b1120;
+    /* Dark Navy */
+    --bg-card: #1e293b;
+    /* Slate 800 */
+    --bg-input: #334155;
+    /* Slate 700 */
 
     /* Branding */
-    --primary: #10b981;
-    /* Emerald Green */
-    --primary-hover: #059669;
-    --primary-glow: rgba(16, 185, 129, 0.4);
+    --primary: #3b82f6;
+    /* Royal Blue */
+    --primary-hover: #2563eb;
+    --primary-glow: rgba(59, 130, 246, 0.4);
 
     --accent-red: #ef4444;
     /* Stop/Crash */
     --accent-gold: #f59e0b;
     /* Attention */
-    --text-main: #ffffff;
+    --text-main: #f8fafc;
+    /* Slate 50 */
     --text-muted: #94a3b8;
+    /* Slate 400 */
 
     /* Effects */
-    --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --radius: 12px;
     --font-main: 'Outfit', sans-serif;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -523,9 +525,11 @@ body {
     font-size: 0.8rem;
     color: var(--text-muted);
 }
+
 /* --- Modal Styles --- */
 .modal-backdrop {
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
     position: fixed;
     top: 0;
     left: 0;
@@ -613,7 +617,8 @@ body {
     margin-top: 0;
 }
 
-.modal-body p, .modal-body ul {
+.modal-body p,
+.modal-body ul {
     margin-bottom: 15px;
 }
 
