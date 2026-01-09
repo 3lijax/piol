@@ -147,28 +147,7 @@ function detectType(symbol) {
     return 'volatility'; // fallback
 }
 
-function extractDigit(price, pipSize) {
-    if (price === null || price === undefined) return 0;
-
-    let priceStr;
-    if (typeof price === 'number') {
-        // If pipSize is provided (e.g. 2, 3, 5), use it. Default to 5 only if unknown.
-        // But for Volatility indices, checking the string length or passed pip_size is better.
-        if (pipSize !== undefined && pipSize !== null) {
-            priceStr = price.toFixed(pipSize);
-        } else {
-            // Try to detect decimals from the number itself if no pipSize
-            // This is safer than forcing 5
-            priceStr = String(price);
-        }
-    } else {
-        priceStr = String(price);
-    }
-
-    const digitsOnly = priceStr.replace(/[^0-9]/g, '');
-    if (!digitsOnly) return 0;
-    return parseInt(digitsOnly.slice(-1));
-}
+const extractDigit = (price) => parseInt(price.toString().slice(-1));
 
 function statsFromArray(arr) {
     if (!arr.length) return { mean: 0, std: 0 };
@@ -302,30 +281,44 @@ class WSClient {
 }
 
 // --- Data Handling & UI Updates ---
+// --- Data Handling & UI Updates ---
 function handleNewData(price, digit) {
     // Basic UI
     DOM.display.digit.innerText = digit;
     updateChart(price);
 
-    if (State.isAnalyzing) {
-        State.ticks.push({ price, digit });
-        State.totalDigits++;
+    // Immediate Analysis (No Gate)
+    State.ticks.push({ price, digit });
+    if (State.ticks.length > 1000) State.ticks.shift(); // Buffer cap
+    State.totalDigits++;
 
-        // Update Transitions
-        if (State.ticks.length > 1) {
-            const prev = State.ticks[State.ticks.length - 2].digit;
-            State.transitions[prev][digit]++;
-        }
-
-        // Stats
-        DOM.stats.totalDigits.innerText = State.totalDigits;
-        DOM.stats.dataPoints.innerText = State.ticks.length;
-
-        updateFrequency();
-
-        // Auto-predict if needed or just update internal state
-        // For now, we wait for user to click predict, OR we could do real-time confidence
+    // Update Transitions
+    if (State.ticks.length > 1) {
+        const prev = State.ticks[State.ticks.length - 2].digit;
+        State.transitions[prev][digit]++;
     }
+
+    // Stats
+    DOM.stats.totalDigits.innerText = State.totalDigits;
+    DOM.stats.dataPoints.innerText = State.ticks.length;
+
+    updateFrequency();
+    updateOverUnder(digit); // New Function
+}
+
+function updateOverUnder(digit) {
+    // Logic: 0-4 Under, 5-9 Over
+    // We can add a simple visual if needed, for now we ensure logic runs
+    // Could update a specific UI element if requested
+}
+
+function resetStats() {
+    State.ticks = [];
+    State.transitions = Array.from({ length: 10 }, () => Array(10).fill(0));
+    State.totalDigits = 0;
+    DOM.stats.totalDigits.innerText = '0';
+    DOM.stats.dataPoints.innerText = '0';
+    updateFrequency(); // Clear UI
 }
 
 function updateConnectionStatus(text, statusClass) {
@@ -346,7 +339,7 @@ function updateFrequency() {
 
     const total = State.ticks.length;
     counts.forEach((count, i) => {
-        const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+        const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
         const elPct = document.getElementById(`d-pct-${i}`);
         if (elPct) elPct.innerText = `${pct}%`;
 
@@ -502,6 +495,14 @@ function setupEventListeners() {
 }
 
 function setSymbol(symbol) {
+    // Unsubscribe previous
+    if (State.wsClient && State.wsClient.ws && State.wsClient.ws.readyState === WebSocket.OPEN) {
+        State.wsClient.ws.send(JSON.stringify({ forget_all: 'ticks' }));
+        State.wsClient.ws.send(JSON.stringify({ forget_all: 'candles' }));
+    }
+
+    resetStats(); // Clear previous data
+
     State.currentSymbol = symbol;
     State.engineType = detectType(symbol);
     DOM.display.chartTitle.innerText = `${symbol} (${State.engineType})`;
@@ -514,8 +515,7 @@ function setSymbol(symbol) {
         default: State.engineInstance = new VolatilityEngine();
     }
 
-    // Reset Data
-    State.ticks = [];
+    // Reset Chart Data
     if (State.chart) {
         State.chart.data.datasets[0].data = Array(CONFIG.maxTicks).fill(null);
         State.chart.update();
