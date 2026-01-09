@@ -252,45 +252,40 @@ class WSClient {
 
 // --- Data Handling & UI Updates ---
 // --- Data Handling & UI Updates ---
+// --- Data Handling & UI Updates ---
 function handleNewData(price, digit) {
-    // Basic UI
+    // 1. Core UI Updates
     DOM.display.digit.innerText = digit;
     updateChart(price);
 
-    // Immediate Analysis (No Gate)
+    // 2. State Management (Instant - No Buffering)
     State.ticks.push({ price, digit });
-    if (State.ticks.length > 1000) State.ticks.shift(); // Buffer cap
+    if (State.ticks.length > CONFIG.maxTicks) State.ticks.shift();
     State.totalDigits++;
 
-    // Update Transitions
-    if (State.ticks.length > 1) {
-        const prev = State.ticks[State.ticks.length - 2].digit;
-        State.transitions[prev][digit]++;
-    }
-
-    // Stats
+    // 3. UI Statistics Update
     DOM.stats.totalDigits.innerText = State.totalDigits;
     DOM.stats.dataPoints.innerText = State.ticks.length;
 
-    updateFrequency();
-    updateFrequency();
-
-    // 3. Strategy Routing
+    // 4. Strategy Routing
     const activeStrategy = DOM.select.strategy.value;
     switch (activeStrategy) {
         case 'over_under':
-            updateOverUnderUI(digit);
+            updateOverUnder(digit);
             break;
         case 'even_odd':
-            updateEvenOddUI(digit);
+            updateEvenOdd(digit);
             break;
         case 'matches_differs':
-            updateMatchesUI(digit);
+            updateMatches(digit);
             break;
     }
+
+    // 5. Update Grid with Winning Highlight
+    updateFrequency(digit);
 }
 
-function updateOverUnderUI(currentDigit) {
+function updateOverUnder(currentDigit) {
     const counts = { over: 0, under: 0 };
 
     // Logic: 0-4 = Under, 5-9 = Over
@@ -298,8 +293,6 @@ function updateOverUnderUI(currentDigit) {
         if (t.digit > 4) counts.over++;
         else counts.under++;
     });
-
-    const total = State.ticks.length;
 
     // Update Feed Status Text for Real-Time Feedback
     const statusText = document.getElementById('feed-status-text');
@@ -309,35 +302,40 @@ function updateOverUnderUI(currentDigit) {
     }
 }
 
-function updateEvenOddUI(digit) {
+// 1. Even/Odd Strategy Logic
+function updateEvenOdd(digit) {
     const counts = { even: 0, odd: 0 };
     State.ticks.forEach(t => {
         if (t.digit % 2 === 0) counts.even++;
         else counts.odd++;
     });
 
-    // Update Status
+    const total = State.ticks.length;
+    const evenPct = total > 0 ? ((counts.even / total) * 100).toFixed(1) : '0.0';
+    const oddPct = total > 0 ? ((counts.odd / total) * 100).toFixed(1) : '0.0';
+
+    // Map to your existing "Prediction" text element
     const statusText = document.getElementById('feed-status-text');
     if (statusText) {
-        statusText.innerText = `Bias: ${digit % 2 === 0 ? 'EVEN' : 'ODD'}`;
-        statusText.style.color = digit % 2 === 0 ? '#3b82f6' : '#f59e0b';
+        statusText.innerHTML = `Bias: <span style="color: ${digit % 2 === 0 ? 'var(--primary)' : 'var(--accent-gold)'}">${digit % 2 === 0 ? 'EVEN' : 'ODD'}</span> (${digit % 2 === 0 ? evenPct : oddPct}%)`;
     }
 }
 
-function updateMatchesUI(currentDigit) {
-    // This highlights the most frequent digit in the Digit Frequency grid
+// 2. Matches/Differs Strategy Logic
+function updateMatches(digit) {
     const counts = Array(10).fill(0);
     State.ticks.forEach(t => counts[t.digit]++);
 
-    const maxOccurrences = Math.max(...counts);
-    const topDigit = counts.indexOf(maxOccurrences);
+    const total = State.ticks.length;
+    const digitPct = total > 0 ? ((counts[digit] / total) * 100).toFixed(1) : '0.0';
 
     const statusText = document.getElementById('feed-status-text');
     if (statusText) {
-        statusText.innerText = `Top Match: Digit ${topDigit}`;
-        statusText.style.color = '#10b981'; // Success Green
+        statusText.innerHTML = `Match: <span style="color: #10b981">Digit ${digit}</span> (${digitPct}%)`;
     }
 }
+
+
 
 function resetStats() {
     State.ticks = [];
@@ -360,25 +358,30 @@ function updateConnectionStatus(text, statusClass) {
     }
 }
 
-function updateFrequency() {
+function updateFrequency(activeDigit) {
     const counts = Array(10).fill(0);
     State.ticks.forEach(t => counts[t.digit]++);
-
     const total = State.ticks.length;
-    counts.forEach((count, i) => {
-        const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-        const elPct = document.getElementById(`d-pct-${i}`);
-        if (elPct) elPct.innerText = `${pct}%`;
 
+    for (let i = 0; i <= 9; i++) {
+        const pct = total > 0 ? ((counts[i] / total) * 100).toFixed(1) : '0';
+
+        // Ensure robust selection
         const card = document.getElementById(`d-card-${i}`);
+
         if (card) {
-            card.style.borderColor = 'transparent';
-            if (total > 10) {
-                const max = Math.max(...counts);
-                if (count === max) card.style.borderColor = 'var(--primary)';
+            // Update percentage text - check for both class names to be safe
+            const pctElem = card.querySelector('.pct') || card.querySelector('.percent');
+            if (pctElem) pctElem.innerText = `${pct}%`;
+
+            // Winning Highlight: Add 'active' class to the current digit card
+            if (i === activeDigit) {
+                card.classList.add('active-digit-pulse');
+            } else {
+                card.classList.remove('active-digit-pulse');
             }
         }
-    });
+    }
 }
 
 function updateChart(price) {
