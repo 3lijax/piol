@@ -147,7 +147,7 @@ function detectType(symbol) {
     return 'volatility'; // fallback
 }
 
-const extractDigit = (price) => parseInt(price.toString().slice(-1));
+const extractDigit = (price) => Number(price.toString().slice(-1));
 
 function statsFromArray(arr) {
     if (!arr.length) return { mean: 0, std: 0 };
@@ -176,35 +176,17 @@ class VolatilityEngine extends BaseEngine {
 
 class BoomCrashEngine extends BaseEngine {
     constructor() { super('boom_crash'); }
-    onCandles(candles) {
-        const last = candles.at(-1);
-        const price = Number(last.close);
+    onTick(tick) {
+        const price = Number(tick.quote);
         const digit = extractDigit(price);
-
-        // Spike detection
-        const closes = candles.map(c => Number(c.close));
-        const spike = this.detectSpike(closes);
-        State.engineMeta.lastSpike = spike;
-
         handleNewData(price, digit);
-    }
-
-    detectSpike(series) {
-        if (series.length < 3) return { isSpike: false };
-        const changes = [];
-        for (let i = 1; i < series.length; i++) changes.push(Math.abs(series[i] - series[i - 1]));
-        const { mean, std } = statsFromArray(changes);
-        const last = changes.at(-1);
-        const threshold = Math.max(mean + 3 * std, mean * 3, 1e-8);
-        return { isSpike: last > threshold, magnitude: last };
     }
 }
 
 class StepEngine extends BaseEngine {
     constructor() { super('step'); }
-    onCandles(candles) {
-        const last = candles.at(-1);
-        const price = Number(last.close);
+    onTick(tick) {
+        const price = Number(tick.quote);
         const digit = extractDigit(price);
         handleNewData(price, digit);
     }
@@ -212,9 +194,8 @@ class StepEngine extends BaseEngine {
 
 class JumpEngine extends BaseEngine {
     constructor() { super('jump'); }
-    onCandles(candles) {
-        const last = candles.at(-1);
-        const price = Number(last.close);
+    onTick(tick) {
+        const price = Number(tick.quote);
         const digit = extractDigit(price);
         handleNewData(price, digit);
     }
@@ -243,11 +224,8 @@ class WSClient {
         this.ws.onmessage = (msg) => {
             try {
                 const data = JSON.parse(msg.data);
-                if (data.tick && State.engineType === 'volatility') {
+                if (data.tick) {
                     State.engineInstance.onTick(data.tick);
-                } else if (data.candles || (data.history && data.history.candles)) {
-                    const candles = data.candles || data.history.candles;
-                    State.engineInstance.onCandles(candles);
                 } else if (data.error) {
                     console.error("WS Error:", data.error.message);
                 }
@@ -263,20 +241,10 @@ class WSClient {
     }
 
     subscribe() {
-        if (State.engineType === 'volatility') {
-            this.ws.send(JSON.stringify({
-                ticks: State.currentSymbol,
-                subscribe: 1
-            }));
-        } else {
-            this.ws.send(JSON.stringify({
-                ticks_history: State.currentSymbol,
-                style: 'candles',
-                granularity: 60, // 1 minute candles for boom/crash etc as default
-                count: CONFIG.candleCount,
-                subscribe: 1
-            }));
-        }
+        this.ws.send(JSON.stringify({
+            ticks: State.currentSymbol,
+            subscribe: 1
+        }));
     }
 }
 
@@ -362,8 +330,24 @@ function updateChart(price) {
     DOM.display.chartPrice.innerText = price.toFixed(4);
 
     const data = State.chart.data.datasets[0].data;
+    const bgColors = State.chart.data.datasets[0].pointBackgroundColor;
+    const borderColors = State.chart.data.datasets[0].pointBorderColor;
+
     data.push(price);
-    if (data.length > CONFIG.maxTicks) data.shift();
+
+    // Dynamic Matches Visualization
+    // Even = Royal Blue (#3b82f6), Odd = Lighter Blue (#60a5fa)
+    const isEven = digit % 2 === 0;
+    const color = isEven ? '#3b82f6' : '#60a5fa';
+
+    bgColors.push('#0b1120'); // Keep background dark navy
+    borderColors.push(color);
+
+    if (data.length > CONFIG.maxTicks) {
+        data.shift();
+        bgColors.shift();
+        borderColors.shift();
+    }
 
     State.chart.update('none');
 
@@ -395,8 +379,8 @@ function updateChart(price) {
 
 // --- AI Prediction ---
 function generatePrediction() {
-    if (State.ticks.length < 5) {
-        alert("Need more data for analysis...");
+    if (State.ticks.length < 1) {
+        alert("Waiting for first data point...");
         return;
     }
 
@@ -518,6 +502,8 @@ function setSymbol(symbol) {
     // Reset Chart Data
     if (State.chart) {
         State.chart.data.datasets[0].data = Array(CONFIG.maxTicks).fill(null);
+        State.chart.data.datasets[0].pointBackgroundColor = [];
+        State.chart.data.datasets[0].pointBorderColor = [];
         State.chart.update();
     }
 }
@@ -561,8 +547,8 @@ function initChart() {
                 backgroundColor: gradient,
                 borderWidth: 2,
                 pointRadius: 4,
-                pointBackgroundColor: '#0b1120',
-                pointBorderColor: '#3b82f6',
+                pointBackgroundColor: [], // Dynamic Array
+                pointBorderColor: [],     // Dynamic Array
                 pointBorderWidth: 2,
                 fill: true,
                 tension: 0.4
