@@ -1,3 +1,17 @@
+import { auth, signOut, onAuthStateChanged } from './firebase-config.js';
+
+// Auth Guard & UI Update
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = 'index.html';
+    } else {
+        const welcomeMsg = document.querySelector('.user-info p');
+        if (welcomeMsg) {
+            welcomeMsg.innerHTML = `Welcome,<br>${user.email}`;
+        }
+    }
+});
+
 // --- Configuration & Constants ---
 const CONFIG = {
     app_id: 1089,
@@ -469,7 +483,13 @@ function setupEventListeners() {
     });
 
     DOM.btn.logout.addEventListener('click', () => {
-        if (confirm("Sign out?")) window.location.href = 'index.html';
+        if (confirm("Sign out?")) {
+            signOut(auth).then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Sign Out Error', error);
+            });
+        }
     });
 
     DOM.btn.predict.addEventListener('click', generatePrediction);

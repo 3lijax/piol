@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Profit Digit Pro</title>
+    <title>Login - TradingPoolFX</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -186,7 +186,7 @@
 <body>
 
     <div class="login-card">
-        <h1 class="logo">Profit Digit Pro</h1>
+        <h1 class="logo">TradingPoolFX</h1>
         <p class="subtitle">Advanced Trading Analytics</p>
 
         <div class="license-badge">
@@ -196,13 +196,12 @@
         <form id="login-form">
             <div class="form-group">
                 <label>Email ID</label>
-                <input type="email" class="input-field" placeholder="trader@deriv.com" value="trader1@deriv.com"
-                    required>
+                <input type="email" class="input-field" placeholder="trader@deriv.com" required>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" class="input-field" placeholder="••••••••" value="password123" required>
+                <input type="password" class="input-field" placeholder="••••••••" required>
             </div>
 
             <label class="checkbox-group">
@@ -214,7 +213,8 @@
         </form>
 
         <div class="social-buttons">
-            <a href="#" class="btn-social">
+            <a href="https://wa.me/447352028080?text=I%20would%20like%20to%20get%20logins%20for%20Tradingpoolfx"
+                class="btn-social">
                 <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem; color: #25D366;"></i> WhatsApp
             </a>
             <a href="#" class="btn-social">
@@ -222,24 +222,49 @@
             </a>
         </div>
 
-        <a href="mailto:support@profitdigitpro.com" class="footer-link">Need Help? Contact Support</a>
+        <a href="mailto:support@tradingpoolfx.com" class="footer-link">Need Help? Contact Support</a>
 
         <div class="copyright">
-            &copy; 2026 Profit Digit Pro. All rights reserved.
+            &copy; 2026 TradingPoolFX. All rights reserved.
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+
         document.getElementById('login-form').addEventListener('submit', function (e) {
             e.preventDefault();
-            // Simple mock login
+
+            const email = this.querySelector('input[type="email"]').value;
+            const password = this.querySelector('input[type="password"]').value;
             const btn = this.querySelector('.btn-login');
+            const originalBtnContent = btn.innerHTML;
+
+            // Loading state
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
             btn.style.opacity = '0.8';
+            btn.disabled = true;
 
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    // Provide a small delay for UI feedback
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500);
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error("Login Error:", errorCode, errorMessage);
+                    alert("Login failed: " + errorMessage);
+
+                    // Reset button
+                    btn.innerHTML = originalBtnContent;
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                });
         });
     </script>
 </body>
