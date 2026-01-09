@@ -338,19 +338,22 @@ body {
 }
 
 .digit-card .pct,
-.digit-card .percent {
+.digit-card .digit-percent {
     font-size: 0.75rem;
     color: var(--primary);
     transition: color 0.2s ease;
+    font-weight: 600;
 }
 
-/* Highlight for the current winning digit card */
+/* Real-time Winning Digit Highlight */
 .digit-card.active-digit-pulse {
     background: rgba(59, 130, 246, 0.25) !important;
-    /* Royal Blue tint */
+    /* Tinted Navy */
     border-color: var(--primary) !important;
-    transform: scale(1.05);
+    /* Royal Blue */
+    transform: translateY(-5px) scale(1.05);
     box-shadow: 0 0 15px var(--primary-glow);
+    /* */
     transition: all 0.1s ease-out;
 }
 

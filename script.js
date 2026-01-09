@@ -260,7 +260,7 @@ function handleNewData(price, digit) {
 
     // 2. State Management (Instant - No Buffering)
     State.ticks.push({ price, digit });
-    if (State.ticks.length > CONFIG.maxTicks) State.ticks.shift();
+    if (State.ticks.length > CONFIG.maxTicks * 20) State.ticks.shift(); // 1000 tick buffer
     State.totalDigits++;
 
     // 3. UI Statistics Update
@@ -302,7 +302,8 @@ function updateOverUnder(currentDigit) {
     }
 }
 
-// 1. Even/Odd Strategy Logic
+// --- New Strategy Functions ---
+
 function updateEvenOdd(digit) {
     const counts = { even: 0, odd: 0 };
     State.ticks.forEach(t => {
@@ -311,13 +312,13 @@ function updateEvenOdd(digit) {
     });
 
     const total = State.ticks.length;
-    const evenPct = total > 0 ? ((counts.even / total) * 100).toFixed(1) : '0.0';
-    const oddPct = total > 0 ? ((counts.odd / total) * 100).toFixed(1) : '0.0';
+    const bias = digit % 2 === 0 ? 'EVEN' : 'ODD';
+    const pct = total > 0 ? (((digit % 2 === 0 ? counts.even : counts.odd) / total) * 100).toFixed(1) : '0.0';
 
     // Map to your existing "Prediction" text element
     const statusText = document.getElementById('feed-status-text');
     if (statusText) {
-        statusText.innerHTML = `Bias: <span style="color: ${digit % 2 === 0 ? 'var(--primary)' : 'var(--accent-gold)'}">${digit % 2 === 0 ? 'EVEN' : 'ODD'}</span> (${digit % 2 === 0 ? evenPct : oddPct}%)`;
+        statusText.innerHTML = `Bias: <span style="color: ${digit % 2 === 0 ? '#3b82f6' : '#f59e0b'}">${bias}</span> (${pct}%)`;
     }
 }
 
@@ -370,9 +371,8 @@ function updateFrequency(activeDigit) {
         const card = document.getElementById(`d-card-${i}`);
 
         if (card) {
-            // Update percentage text - check for both class names to be safe
-            const pctElem = card.querySelector('.pct') || card.querySelector('.percent');
-            if (pctElem) pctElem.innerText = `${pct}%`;
+            const pctDisplay = card.querySelector('.digit-percent');
+            if (pctDisplay) pctDisplay.innerText = `${pct}%`;
 
             // Winning Highlight: Add 'active' class to the current digit card
             if (i === activeDigit) {
@@ -631,7 +631,8 @@ function initDigitGrid() {
         const card = document.createElement('div');
         card.className = 'digit-card';
         card.id = `d-card-${i}`;
-        card.innerHTML = `<span class="num">${i}</span><span class="pct" id="d-pct-${i}">0%</span>`;
+        card.dataset.digit = i; // Add data attribute for new logic
+        card.innerHTML = `<span class="num">${i}</span><span class="digit-percent" id="d-pct-${i}">0%</span>`;
         DOM.display.digitGrid.appendChild(card);
     }
 }
