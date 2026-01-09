@@ -84,6 +84,17 @@
                         <span id="feed-subtext">Connecting...</span>
                     </div>
                 </div>
+
+                <div class="confidence-container" style="margin-top: 15px; margin-bottom: 5px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">
+                        <span>Probability Level</span>
+                        <span id="prob-percent">0%</span>
+                    </div>
+                    <div class="confidence-bar-bg">
+                        <div id="confidence-level" class="confidence-bar-fill"></div>
+                    </div>
+                </div>
             </div>
 
             <button id="predict-btn" class="btn-predict">
@@ -103,20 +114,7 @@
                 </div>
             </div>
 
-            <div class="confidence-section">
-                <!-- Old layout replaced -->
-            </div>
 
-            <div class="confidence-container" style="margin-top: 10px; margin-bottom: 15px;">
-                <div
-                    style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">
-                    <span>Probability Level</span>
-                    <span id="prob-percent">0%</span>
-                </div>
-                <div class="confidence-bar-bg">
-                    <div id="confidence-level" class="confidence-bar-fill"></div>
-                </div>
-            </div>
 
             <div class="analysis-box">
                 <div class="a-icon"><i class="fa-solid fa-bolt"></i></div>

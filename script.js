@@ -427,6 +427,59 @@ function updateChart(price) {
 }
 
 // --- AI Prediction ---
+// --- AI Prediction (Manual Deep Analysis) ---
+function generatePrediction() {
+    if (State.ticks.length < 1) {
+        alert("Waiting for first data point...");
+        return;
+    }
+
+    DOM.display.predictionCard.style.display = 'block';
+
+    const freq = Array(10).fill(0);
+    State.ticks.forEach(t => freq[t.digit]++);
+    const total = State.ticks.length;
+
+    // Entropy
+    let entropy = 0;
+    freq.forEach(c => {
+        if (c > 0) {
+            const p = c / total;
+            entropy -= p * Math.log2(p);
+        }
+    });
+
+    // Odd/Even bias
+    const recent = State.ticks.slice(-20);
+    let evens = 0, odds = 0;
+    recent.forEach(t => t.digit % 2 === 0 ? evens++ : odds++);
+    const type = evens > odds ? 'Even' : 'Odd';
+
+    // Confidence score
+    const entropyScore = 1 - Math.min(entropy / 3.3, 1);
+    const biasScore = Math.abs(evens - odds) / recent.length;
+
+    let score = (0.5 * entropyScore) + (0.5 * biasScore);
+    if (State.engineMeta && State.engineMeta.lastSpike && State.engineMeta.lastSpike.isSpike) score += 0.2;
+
+    const confidence = Math.min(99, Math.round(score * 100));
+
+    // UI Update
+    const pVal = document.getElementById('p-value');
+    if (pVal) {
+        pVal.innerText = type;
+        pVal.className = `p-value ${type === 'Odd' ? 'green' : 'red'}`;
+    }
+
+    // Update Shared Confidence Meter
+    updateConfidenceBar(confidence);
+
+    const analysisMsg = `AI analysis: Entropy ${entropy.toFixed(3)}. ${recent.length} tick sample shows ${type} bias. Market mode: ${State.engineType.toUpperCase()}.`;
+    DOM.display.aiText.innerText = analysisMsg;
+
+    DOM.display.predictionCard.scrollIntoView({ behavior: 'smooth' });
+}
+
 // --- High Probability Prediction Engine (70% - 90%) ---
 function generateHighProbPrediction() {
     if (State.ticks.length === 0) return;
@@ -521,7 +574,7 @@ function setupEventListeners() {
         }
     });
 
-
+    DOM.btn.predict.addEventListener('click', generatePrediction);
 
     DOM.select.asset.addEventListener('change', (e) => {
         State.currentSymbol = e.target.value;
