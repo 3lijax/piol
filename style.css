@@ -453,19 +453,22 @@ body {
     font-weight: 600;
 }
 
-.c-bar-bg {
-    height: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
+/* Confidence Meter */
+.confidence-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.c-bar-fill {
+.confidence-bar-fill {
+    width: 0%;
     height: 100%;
-    background: white;
-    /* Will be colored dynamically */
-    border-radius: 6px;
-    transition: width 0.5s ease;
+    background: linear-gradient(90deg, var(--primary), #64ffda);
+    box-shadow: 0 0 10px var(--primary-glow);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .analysis-box {

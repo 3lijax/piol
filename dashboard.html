@@ -104,12 +104,17 @@
             </div>
 
             <div class="confidence-section">
-                <div class="c-header">
-                    <span>Confidence</span>
-                    <span id="c-percent">0.0%</span>
+                <!-- Old layout replaced -->
+            </div>
+
+            <div class="confidence-container" style="margin-top: 10px; margin-bottom: 15px;">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">
+                    <span>Probability Level</span>
+                    <span id="prob-percent">0%</span>
                 </div>
-                <div class="c-bar-bg">
-                    <div class="c-bar-fill" id="c-bar-fill" style="width: 0%"></div>
+                <div class="confidence-bar-bg">
+                    <div id="confidence-level" class="confidence-bar-fill"></div>
                 </div>
             </div>
 

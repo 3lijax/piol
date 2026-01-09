@@ -283,6 +283,9 @@ function handleNewData(price, digit) {
 
     // 5. Update Grid with Winning Highlight
     updateFrequency(digit);
+
+    // 6. High Probability Analysis (Inverted Logic)
+    generateHighProbPrediction();
 }
 
 function updateOverUnder(currentDigit) {
@@ -424,55 +427,58 @@ function updateChart(price) {
 }
 
 // --- AI Prediction ---
-function generatePrediction() {
-    if (State.ticks.length < 1) {
-        alert("Waiting for first data point...");
-        return;
-    }
+// --- High Probability Prediction Engine (70% - 90%) ---
+function generateHighProbPrediction() {
+    if (State.ticks.length === 0) return;
 
-    DOM.display.predictionCard.style.display = 'block';
-
-    // Logic from app.js AI
-    const freq = Array(10).fill(0);
-    State.ticks.forEach(t => freq[t.digit]++);
+    const counts = Array(10).fill(0);
+    State.ticks.forEach(t => counts[t.digit]++);
     const total = State.ticks.length;
 
-    // Entropy
-    let entropy = 0;
-    freq.forEach(c => {
-        if (c > 0) {
-            const p = c / total;
-            entropy -= p * Math.log2(p);
+    const activeStrategy = document.getElementById('strategy-select')?.value || 'over_under';
+    const statusText = document.getElementById('feed-status-text');
+
+    if (activeStrategy === 'matches_differs') {
+        // INVERTED LOGIC: Find the LEAST occurring digit (The "Differs" strategy)
+        const minVal = Math.min(...counts);
+        const safestDigit = counts.indexOf(minVal);
+        const confidence = (((total - minVal) / total) * 100).toFixed(1);
+
+        if (statusText) {
+            statusText.innerHTML = `Safe Bet: <span style="color: #10b981">DIFFERS ${safestDigit}</span> <br><small>Confidence: ${confidence}%</small>`;
         }
-    });
+        updateConfidenceBar(confidence);
+    }
 
-    // Odd/Even bias
-    const recent = State.ticks.slice(-20);
-    let evens = 0, odds = 0;
-    recent.forEach(t => t.digit % 2 === 0 ? evens++ : odds++);
-    const type = evens > odds ? 'Even' : 'Odd';
+    else if (activeStrategy === 'over_under') {
+        // INVERTED LOGIC: Find widest safe margin
+        let underEight = 0;
+        State.ticks.forEach(t => { if (t.digit <= 7) underEight++; });
 
-    // Confidence score
-    const entropyScore = 1 - Math.min(entropy / 3.3, 1);
-    const biasScore = Math.abs(evens - odds) / recent.length; // 0 to 1
+        const confidence = ((underEight / total) * 100).toFixed(1);
 
-    let score = (0.5 * entropyScore) + (0.5 * biasScore);
-    if (State.engineMeta.lastSpike && State.engineMeta.lastSpike.isSpike) score += 0.2;
+        if (confidence >= 70) {
+            if (statusText) {
+                statusText.innerHTML = `Safe Bet: <span style="color: #64ffda">UNDER 8</span> <br><small>Confidence: ${confidence}%</small>`;
+            }
+            updateConfidenceBar(confidence);
+        } else {
+            // Fallback to standard Over/Under if confidence is low, or keep existing text
+            updateConfidenceBar(confidence);
+        }
+    }
+}
 
-    const confidence = Math.min(99, Math.round(score * 100));
-
-    // UI Update
-    document.getElementById('p-value').innerText = type;
-    document.getElementById('p-value').className = `p-value ${type === 'Odd' ? 'green' : 'red'}`; // Green for odd just as example
-
-    document.getElementById('c-percent').innerText = `${confidence}%`;
-    const fill = document.getElementById('c-bar-fill');
-    fill.style.width = `${confidence}%`;
-
-    const analysisMsg = `AI analysis: Entropy ${entropy.toFixed(3)}. ${recent.length} tick sample shows ${type} bias. Market mode: ${State.engineType.toUpperCase()}.`;
-    DOM.display.aiText.innerText = analysisMsg;
-
-    DOM.display.predictionCard.scrollIntoView({ behavior: 'smooth' });
+function updateConfidenceBar(percent) {
+    const bar = document.getElementById('confidence-level');
+    const label = document.getElementById('prob-percent');
+    if (bar) {
+        bar.style.width = `${percent}%`;
+        bar.style.background = percent > 85 ? '#10b981' : '#3b82f6';
+    }
+    if (label) {
+        label.innerText = `${percent}%`;
+    }
 }
 
 // --- Event Setup & Helpers ---
@@ -515,7 +521,7 @@ function setupEventListeners() {
         }
     });
 
-    DOM.btn.predict.addEventListener('click', generatePrediction);
+
 
     DOM.select.asset.addEventListener('change', (e) => {
         State.currentSymbol = e.target.value;
