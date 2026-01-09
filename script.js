@@ -273,7 +273,21 @@ function handleNewData(price, digit) {
     DOM.stats.dataPoints.innerText = State.ticks.length;
 
     updateFrequency();
-    updateOverUnderUI(digit);
+    updateFrequency();
+
+    // 3. Strategy Routing
+    const activeStrategy = DOM.select.strategy.value;
+    switch (activeStrategy) {
+        case 'over_under':
+            updateOverUnderUI(digit);
+            break;
+        case 'even_odd':
+            updateEvenOddUI(digit);
+            break;
+        case 'matches_differs':
+            updateMatchesUI(digit);
+            break;
+    }
 }
 
 function updateOverUnderUI(currentDigit) {
@@ -288,11 +302,40 @@ function updateOverUnderUI(currentDigit) {
     const total = State.ticks.length;
 
     // Update Feed Status Text for Real-Time Feedback
-    // Highlight the active side in your configuration box
     const statusText = document.getElementById('feed-status-text');
     if (statusText) {
         statusText.innerText = `Analyzing: ${currentDigit > 4 ? 'OVER' : 'UNDER'}`;
         statusText.style.color = currentDigit > 4 ? '#64ffda' : '#ef4444';
+    }
+}
+
+function updateEvenOddUI(digit) {
+    const counts = { even: 0, odd: 0 };
+    State.ticks.forEach(t => {
+        if (t.digit % 2 === 0) counts.even++;
+        else counts.odd++;
+    });
+
+    // Update Status
+    const statusText = document.getElementById('feed-status-text');
+    if (statusText) {
+        statusText.innerText = `Bias: ${digit % 2 === 0 ? 'EVEN' : 'ODD'}`;
+        statusText.style.color = digit % 2 === 0 ? '#3b82f6' : '#f59e0b';
+    }
+}
+
+function updateMatchesUI(currentDigit) {
+    // This highlights the most frequent digit in the Digit Frequency grid
+    const counts = Array(10).fill(0);
+    State.ticks.forEach(t => counts[t.digit]++);
+
+    const maxOccurrences = Math.max(...counts);
+    const topDigit = counts.indexOf(maxOccurrences);
+
+    const statusText = document.getElementById('feed-status-text');
+    if (statusText) {
+        statusText.innerText = `Top Match: Digit ${topDigit}`;
+        statusText.style.color = '#10b981'; // Success Green
     }
 }
 
